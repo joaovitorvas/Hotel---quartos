@@ -1,9 +1,11 @@
 const tarefasModel = require("../models/models");
 const moment = require("moment");
 const { body, validationResult } = require("express-validator");
+const auth = require('./../auth'); // Importa o módulo de gerenciamento de autenticação
+
 const TarefasControl = {
 
-    Criarussuario: async (req, res) => {
+    CriarUsuario: async (req, res) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
           console.log(errors);
@@ -23,6 +25,7 @@ const TarefasControl = {
             return error;
         }
     },
+
     regrasValidacao: [
         body("nome")
             .isLength({ min: 3, max: 45 })
@@ -48,10 +51,62 @@ const TarefasControl = {
             })
     ],
 
+    LoginUsuario: async (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            console.log(errors);
+            return res.render("pages/template-home", {
+                dados: req.body,
+                listaErros: errors.array(),
+                pagina: "login",
+                logado: null
+            });
+        }
 
+        try {
+            const { email, senha } = req.body;
+            const user = await tarefasModel.authenticate(email, senha);
 
+            if (!user) {
+                return res.render("pages/template-home", {
+                    mensagem: "Credenciais inválidas",
+                    pagina: "login",
+                    logado: null
+                });
+            }
 
-}
+            // Autenticar usuário usando o gerenciador de autenticação simples
+            auth.authenticateUser(user.id, user); // Armazena o usuário autenticado
 
+            res.render("pages/template-home", { pagina: "home", logado: user });
+        } catch (error) {
+            console.error('Erro no login:', error);
+            return res.render("pages/template-home", {
+                mensagem: "Erro no login",
+                pagina: "login",
+                logado: null
+            });
+        }
+    },
+
+    // Definição das regras de validação para o login
+    regrasValidacaoLogin: [
+        body("email").isEmail().withMessage("Email inválido"),
+        body("senha").notEmpty().withMessage("Senha não pode estar vazia")
+    ],
+
+    LogoutUsuario: async (req, res) => {
+        try {
+            const userId = req.session.user.id; 
+
+            auth.logoutUser(userId);
+
+            res.redirect('/');
+        } catch (error) {
+            console.error('Erro no logout:', error);
+            res.redirect('/'); 
+        }
+    }
+};
 
 module.exports = TarefasControl;

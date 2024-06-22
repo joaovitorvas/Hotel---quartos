@@ -1,14 +1,32 @@
 var pool = require("../../config/pool_conexoes")
+const bcrypt = require('bcrypt');
+const saltRounds = 10; // Número de saltos para o bcrypt
 
 const tarefasModel = {
     create: async (data) => {
         try {
-            const [linhas] = await pool.query('INSERT INTO usuario (`nome_usuario`, `email_usuario`,`senha_usuario`  ) VALUES ( ? , ? , ? ) ',
-             [ data.nome, data.email, data.senha ])  
-            return linhas;
+            // Hash da senha utilizando bcrypt
+            const hashedPassword = await bcrypt.hash(data.senha, saltRounds);
 
+            const [linhas] = await pool.query(
+                'INSERT INTO usuario (`nome_usuario`, `email_usuario`, `senha_usuario`) VALUES (?, ?, ?)',
+                [data.nome, data.email, hashedPassword]
+            );
+
+            return linhas;
         } catch (error) {
-            return error;
+            throw error; // Você pode tratar melhor o erro aqui conforme necessário
+        }
+    },
+
+
+    findByEmail: async (email) => {
+        try {
+            const [rows] = await pool.query('SELECT * FROM usuario WHERE email_usuario = ?', [email]);
+            return rows[0]; // Retorna o primeiro usuário encontrado ou undefined se não houver correspondência
+        } catch (error) {
+            console.error('Erro ao buscar usuário por email:', error);
+            throw error;
         }
     },
 
@@ -58,6 +76,29 @@ const tarefasModel = {
             return error;
         }
     },
+
+    authenticate: async (email, senha) => {
+        try {
+            const [rows] = await pool.query('SELECT * FROM usuario WHERE email_usuario = ?', [email]);
+            const user = rows[0];
+
+            if (!user) {
+                return null; // Usuário não encontrado
+            }
+
+            // Verifica se a senha é válida utilizando bcrypt
+            const match = await bcrypt.compare(senha, user.senha_usuario);
+
+            if (match) {
+                return user; // Retorna o usuário autenticado
+            } else {
+                return null; // Senha incorreta
+            }
+        } catch (error) {
+            throw error; // Você pode tratar melhor o erro aqui conforme necessário
+        }
+    },
+    
   
 };
 

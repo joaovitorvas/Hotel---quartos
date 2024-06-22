@@ -1,19 +1,16 @@
-﻿include header
-<%- include("../partial/header-home") %>
+﻿<%- include("../partial/header-home") %>
 
 <main>
     <div class="login-page">
         <div class="form-cadastro">
             <a href="/"><span id="fechar">&times;</span></a>
-            <form action="login" method="post" class = "login-form">
+            <form action="login" method="post" class="login-form">
                 <h2>Login</h2>
-                <input type="text" name="nome" id="nome" placeholder = "Nome de usuáio ou e-mail" >
-                <input type="password" name="senha" id="senha" placeholder = "Senha de usuário" >
+                <input type="email" name="email" id="email" placeholder="Nome de usuário ou e-mail">
+                <input type="password" name="senha" id="senha" placeholder="Senha de usuário">
                 <button type="submit">Entrar</button>
                 <p class="message">Não é cadastrado? <a href="/cadastro">Crie uma conta</a></p>
             </form>
         </div>
     </div>
-
-
 </main>
