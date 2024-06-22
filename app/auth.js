@@ -1,17 +1,14 @@
-// Arquivo para gerenciamento de autenticação (auth.js)
-let authenticatedUsers = {};
-
 module.exports = {
-    isAuthenticated: (userId) => {
-        return !!authenticatedUsers[userId];
+    isAuthenticated: (req) => {
+        return !!req.session.user;
     },
-    authenticateUser: (userId, userData) => {
-        authenticatedUsers[userId] = userData;
+    authenticateUser: (req, userData) => {
+        req.session.user = userData;
     },
-    logoutUser: (userId) => {
-        delete authenticatedUsers[userId];
+    logoutUser: (req) => {
+        req.session.destroy();
     },
-    getUser: (userId) => {
-        return authenticatedUsers[userId];
+    getUser: (req) => {
+        return req.session.user;
     }
 };

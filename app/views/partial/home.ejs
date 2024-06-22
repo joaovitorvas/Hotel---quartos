@@ -1,5 +1,42 @@
 ﻿<!-- include header -->
-<%- include("../partial/header-home") %>
+<header>
+    <% if (logado) { %>
+        <div class='logado'> 
+            <img src='imagem/logo-azul.png' alt='logo da empresa'> 
+            <a href='/perfil'> 
+                <img src='imagem/img_login.png' alt='silhoueta de perfil de usuário'> 
+            </a>
+            <p>Olá,<br /> <%= logado.nome %><br><a href='/logout'>sair</a></p>
+        </div>
+    <% } else { %>            
+        <div>
+            <img src='imagem/logo-azul.png' alt='logo da empresa'>
+            <a href='/login'>
+                <img src='imagem/img_login.png' alt='silhoueta de perfil de usuário'>
+            </a>
+        </div>
+    <% } %>
+    
+    <nav>
+        <div id="painel-menu">
+            <input type="checkbox">
+            <span></span>
+            <span></span>
+            <span></span>
+            <ul>
+                <li><a href="/quartos">Acomodação</a></li>
+                <li><a href="#">Lazer</a></li>
+                <li><a href="#">Gastronomia</a></li>
+                <li><a href="#">Reservas</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <% if (!logado) { %>
+        <h1>Venha curtir férias inesquecíveis</h1>
+        <img class="hero" src="imagem/hotel.png" alt="imagem da fachada do Hotel">
+    <% } %>
+</header>
 <main>
     <section class="card-dir">
         <img src="imagem/quarto.png" alt="Foto de um quarto do hotel">

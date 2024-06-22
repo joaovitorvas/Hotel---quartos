@@ -2,7 +2,7 @@ var pool = require("../../config/pool_conexoes")
 const bcrypt = require('bcrypt');
 const saltRounds = 10; // Número de saltos para o bcrypt
 
-const tarefasModel = {
+const UsuarioModels = {
     create: async (data) => {
         try {
             // Hash da senha utilizando bcrypt
@@ -102,4 +102,4 @@ const tarefasModel = {
   
 };
 
-module.exports = tarefasModel;
+module.exports = UsuarioModels;

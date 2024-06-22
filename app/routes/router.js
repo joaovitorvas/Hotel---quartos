@@ -1,12 +1,12 @@
 var express = require("express");
 var router = express.Router();
 const tipoQuartosController = require("../controllers/tipoQuartosController");
-const TarefasControl = require("../controllers/control");
+const UsuarioController = require("../controllers/UsuarioController");
 const { body, validationResult } = require("express-validator");
 
 // Rota padrão para a página inicial
 router.get("/", function (req, res) {
-    res.render("pages/template-home", { pagina: "home", logado: null });
+    res.render("pages/template-home", { pagina: "home", logado: req.session.user | null });
 });
 
 // Rota para listar tipos de quartos paginados
@@ -29,14 +29,9 @@ router.get("/cadastro", function (req, res) {
     res.render("pages/template-home", { pagina: "cadastro", logado: null, retorno: null, listaErros: null, dados: null });
 });
 
-// Rota para processar o cadastro de usuário
-router.post("/cadastro", TarefasControl.regrasValidacao, async function (req, res) {
-    TarefasControl.CriarUsuario(req, res);
-});
-
 // Rota para página de perfil
 router.get("/perfil", function (req, res) {
-    res.render("pages/template-home", { pagina: "perfil" });
+    res.render("pages/template-home", { pagina: "perfil", logado: null });
 });
 
 // Rota para página de administração principal
@@ -69,10 +64,21 @@ router.get("/adm-cliente-del", function (req, res) {
     res.render("pages/adm/template-adm", { pagina: "cliente/delete" });
 });
 
-router.post("/login", TarefasControl.regrasValidacaoLogin, function (req, res) {
-  TarefasControl.LoginUsuario(req, res);
+router.get('/login', (req, res) => {
+    res.render('pages/template-home', { pagina: 'login', logado: req.session.user });
 });
 
-router.get('/LogOut', TarefasControl.LogoutUsuario);
+router.post('/login', UsuarioController.regrasValidacaoLogin, UsuarioController.LoginUsuario);
+
+// Rota para página de cadastro de usuário
+router.get('/cadastro', (req, res) => {
+    res.render('pages/template-home', { pagina: 'cadastro', logado: req.session.user });
+});
+
+router.post('/cadastro', UsuarioController.regrasValidacao, UsuarioController.CriarUsuario);
+
+// Rota para logout
+router.get('/logout', UsuarioController.LogoutUsuario);
 
 module.exports = router;
+
